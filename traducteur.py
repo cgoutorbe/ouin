@@ -119,59 +119,48 @@ def split_ligne():
             params = splitParam(registers,nb_param)
     return(instru,params)
 
-def listToBin3(l):
+def listToBin(l,params):
     l = [int(i) for i in l]
-    binaire=0
+    binaire = 0
     binaire+=l[0]<<27
-    binaire+=l[1]<<22
-    binaire+=l[2]<<21
-    binaire+=l[3]<<5
-    binaire+=l[4]
-    hexa=hex(binaire)
-    hexa+='\n'
-    with open('bin.txt', 'w') as output:
+    if(params == 3):
+        binaire+=l[1]<<22
+        binaire+=l[2]<<21
+        binaire+=l[3]<<5
+        binaire+=l[4]
+        hexa=hex(binaire)
+        hexa+='\n'
+        with open('bin.txt', 'w') as output:
+                output.write(hexa)
+        
+    elif(params == 2):
+        if(instru == 'JMP'):
+            binaire+=l[1]<<26
+            binaire+=l[2]<<5
+            binaire+=l[3]
+            hexa=hex(binaire)
+            hexa+='\n'
+            with open('bin.txt', 'w') as output:
+                output.write(hexa)
+        else:
+            binaire+=l[1]<<22
+            binaire+=l[2]
+            hexa=hex(binaire)
+            hexa+='\n'
+            with open('bin.txt', 'w') as output:
+                output.write(hexa)
+    elif(params == 1):
+        binaire+=l[1]
+        hexa=hex(binaire)
+        hexa+='\n'
+        with open('bin.txt', 'w') as output: 
+            output.write(hexa)
+    else:
+        hexa=hex(binaire)
+        hexa+='\n'
+        with open('bin.txt', 'w') as output:
             output.write(hexa)
 
-def listToBinJmp(l):
-    l = [int(i) for i in l]
-    binaire = 0
-    binaire+=l[0]<<27
-    binaire+=l[1]<<26
-    binaire+=l[2]<<5
-    binaire+=l[3]
-    hexa=hex(binaire)
-    hexa+='\n'
-    with open('bin.txt', 'w') as output:
-            output.write(hexa)
-
-def listToBin2(l):
-    l = [int(i) for i in l]
-    binaire = 0
-    binaire+=l[0]<<27
-    binaire+=l[1]<<22
-    binaire+=l[2]
-    hexa=hex(binaire)
-    hexa+='\n'
-    with open('bin.txt', 'w') as output:
-        output.write(hexa)
-
-def listToBinScall(l):
-    l = [int(i) for i in l]
-    binaire = 0
-    binaire+=l[0]<<27
-    binaire+=l[1]
-    hexa=hex(binaire)
-    hexa+='\n'
-    with open('bin.txt', 'w') as output: 
-        output.write(hexa)
-def listToBinStop(l):
-    l = [int(i) for i in l]
-    binaire = 0
-    binaire+=l[0]<<27
-    hexa=hex(binaire)
-    hexa+='\n'
-    with open('bin.txt', 'w') as output:
-        output.write(hexa)
 
 def main():
     instru, params = split_ligne()
@@ -179,17 +168,6 @@ def main():
     cvted_param = convertParam(params,instru)
     cvted_all = cvted_inst+cvted_param
     print(cvted_all)   
-    if(params == 3):
-        listToBin3(cvted_all)
-    elif(params == 2):
-        if(instru == 'JMP'):
-            listToBinJmp(cvted_all)
-        else:
-            listToBin2(cvted_all)
-    elif(params == 1):
-        listToBinScall(cvted_all)
-    else:
-        listToBinStop(cvted_all)
-            
+    listToBin(cvted_all,params)            
 if __name__ == '__main__':
     main()
