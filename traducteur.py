@@ -161,13 +161,39 @@ def listToBin(l,params):
         with open('bin.txt', 'w') as output:
             output.write(hexa)
 
+def label():
+    """on parcout la première colonne on stocke les valeurs des labels et on remplace par les adresses correspondantes"""
+    fichier = 'asm.txt'
+    tableLabel = []
+    compteLigne =0
+    with open(fichier, 'r') as human:
+        for ligne in human.readlines():
+            compteLigne+=1 #donne la valeur de la ligne
+            print(ligne)
+            if ligne[0] == 'L':
+                #on a un Label
+                tableLabel.append([ligne.split(':')[0],compteLigne])
+                #on ajoute le nom du label et le numéro de ligne correspondan 
+        print(tableLabel)    
 
+def remplaceLabel(tableLabel):
+    fichier = 'asm.txt'
+    fichiero = 'asm.o'
+    fp = open(fichiero,'w')
+    with open(fichier,'r') as human:
+        for ligne in human.readlines():
+            for L in tableLabel[:0]:
+                print(L)
+        
 def main():
+    tableLabel = label()
+    remplaceLabel(tableLabel)
     instru, params = split_ligne()
     cvted_inst = [convertInstruction(instru)]
     cvted_param = convertParam(params,instru)
     cvted_all = cvted_inst+cvted_param
     print(cvted_all)   
     listToBin(cvted_all,params)            
+
 if __name__ == '__main__':
     main()
