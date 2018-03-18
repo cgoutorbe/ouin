@@ -1,19 +1,33 @@
 programs = []
 regs = []
 pc = 0
+memInstr = []
+memData = []
 
-def fetch(fichier):
-    with open(fichier, 'r') as f:
-            global pc
-            pc += 1
-            line = f.readline()
-            print(line)
-    return(line)
-# A Regrouper
+fonction = {}
+
+fonction[1] = "ADD"
+fonction[2] = "SUB" 
+fonction[3] = "MULT"
+fonction[4] = "DIV"
+fonction[5] = "AND"
+fonction[6] = "OR"
+fonction[7] = "XOR"
+fonction[8] = "SHL"
+fonction[9] = "SHR"
+fonction[10] = "SLT"
+fonction[11] = "SLE"
+fonction[12] = "SEQ"
+fonction[13] = "LOAD"
+fonction[14] = "STORE"
+fonction[15] = "JMP"
+fonction[16] = "BRAZ"
+fonction[17] = "BRANZ"
+fonction[18] = "SCALL"
+fonction[0] = "STOP"
 
 def binToInstr(instr):
     return (int((instr & 0xF8000000)>>27))
-
 
 def decode(instr,i):
     
@@ -45,13 +59,28 @@ def decode(instr,i):
         n = (instr & 0x07FFFFFF)
         return([codeop,n])
 
+def run(instruction):
+    
+    i = binToInstr(instruction)
+    memInstr.append(decode(instruction,i))
+    print(memInstr)
+    #appel de la fonction correspondant à l'instruction
+    
+
+
 def main():
     
+    global pc
     pc=0
-    instruction = int(fetch('bin.txt'),16)
-    i = binToInstr(instruction)
-    print(decode(instruction,i))
     
+    with open('bin.txt', 'r') as f:
+        lines = f.readlines()
+        print(lines)
+    
+    for line in lines:
+        print(line)
+        run(int(line,16))
+        pc+=1
 
 
 

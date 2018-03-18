@@ -45,16 +45,16 @@ def convertInstruction(instru):
 
 def getNbParameters(instru):
     if instru ==0:
-            print('Instruction stop')
+            #print('Instruction stop')
             return(0)
     elif 1<=instru<=14:
-            print('Instruction à 3 paramètres : R_alpha, O, R_beta')
+            #print('Instruction à 3 paramètres : R_alpha, O, R_beta')
             return(3)
     elif 15<=instru<=17:
-            print('Instruction à 2 paramètres : r, a')
+            #print('Instruction à 2 paramètres : r, a')
             return(2)
     elif instru==18:
-            print('Instruction à 1 paramètres : n')
+            #print('Instruction à 1 paramètres : n')
             return(1)
 
 def splitParam(registers, nb_param):
@@ -68,7 +68,7 @@ def splitParam(registers, nb_param):
     
     elif nb_param == 3:
             R_alpha,O,R_beta = registers.rstrip('\n').split(',')
-            print(R_beta)
+            #print(R_beta)
             #R_alpha = registers.split(',')[0] 
             #O = registers.split(',')[1] 
             #R_beta = registers.split(',')[2].rstrip('\n')
@@ -76,7 +76,7 @@ def splitParam(registers, nb_param):
     else:
             return([])
 
-def convertParam(params,instru):
+def convertParam(tableLabel,params,instru):
     n = len(params)
     if n==3:
             R_alpha=params[0][1:]
@@ -85,6 +85,7 @@ def convertParam(params,instru):
             if O[0]=='R':
                     immediat=0
                     O=O[1:]
+     
             else:
                     immediat=1
             conversion=[R_alpha,immediat,O,R_beta]
@@ -96,6 +97,13 @@ def convertParam(params,instru):
             if O[0]=='R':
                     immediat=0
                     O=O[1:]
+            elif O[0] == 'L':
+                    immediat = 0
+                    for l in tableLabel:
+                        print("tableLabel l[0] ",l[0])#nul a refaire avec des dico
+                        if O == l[0]:
+                            immediat = 1
+                            O = l[1]
             else:
                     immediat=1
             conversion=[immediat,O,r]
@@ -109,87 +117,82 @@ def convertParam(params,instru):
             conversion = []
     return (conversion)
 
-def split_ligne(tableLabel,compteur):
+def split_ligne(tableLabel,listeInstruction):
     fichier='asm.txt'
-    
+    compteur = 0
     with open(fichier, 'r') as human:
-            ligne = human.readline()
-            print(ligne)
+        for ligne in  human.readlines():
+            #print(ligne)
             #on cherche si il y a un label
+            compteur +=1
             labs = ligne.split(': ')
             if  labs[0][0]=='L':
                 #il y a un label
                 tableLabel.append((labs[0],compteur))
-                print("label enregistré",labs)
-                print("==========================")
                 ligne =  labs[1]
-                print(tableLabel)
-                print("ligne sans label\n")
-                print(ligne)
+                #print(tableLabel)
+             
+            listeInstruction.append(ligne.strip('\n').strip('\t'))
+    #return (instru,params)
 
-            instru, registers = ligne.split(' ')[0], ligne.split(' ')[1]
-            nb_param = getNbParameters(convertInstruction(instru))
-            params = splitParam(registers,nb_param)
+def run(listeInstruction,tableLabel):
 
-    return(instru,params)
+    i=0
+    for i in range(len(listeInstruction)-1):#on enleve la derniere ligne
+        instru, registers = listeInstruction[i].split(' ')[0], listeInstruction[i].split(' ')[1]
+        
+        nb_param = getNbParameters(convertInstruction(instru))
+        params = splitParam(registers,nb_param)
+        print("parametre ",nb_param)
+        cvted_inst = [convertInstruction(instru)]
+        cvted_param = convertParam(tableLabel,params,instru)
+        cvted_all = cvted_inst+cvted_param
+        
+        print("table de label:",tableLabel)
+        print("conversion de l'instruction:",cvted_all)
 
-def listToBin(l,params):
+        listToBin(cvted_all,nb_param,instru)            
+
+def listToBin(l,params,instru):
     l = [int(i) for i in l]
     binaire = 0
     binaire+=l[0]<<27
+
     if(params == 3):
         binaire+=l[1]<<22
         binaire+=l[2]<<21
         binaire+=l[3]<<5
         binaire+=l[4]
-        hexa=hex(binaire)
-        hexa+='\n'
-        with open('bin.txt', 'w') as output:
-                output.write(hexa)
         
     elif(params == 2):
         if(instru == 'JMP'):
             binaire+=l[1]<<26
             binaire+=l[2]<<5
             binaire+=l[3]
-            hexa=hex(binaire)
-            hexa+='\n'
-            with open('bin.txt', 'w') as output:
-                output.write(hexa)
         else:
             binaire+=l[1]<<22
             binaire+=l[2]
-            hexa=hex(binaire)
-            hexa+='\n'
-            with open('bin.txt', 'w') as output:
-                output.write(hexa)
 
     elif(params == 1):
         binaire+=l[1]
-        hexa=hex(binaire)
-        hexa+='\n'
-        with open('bin.txt', 'w') as output: 
-            output.write(hexa)
-
     else:
-        hexa=hex(binaire)
-        hexa+='\n'
-        with open('bin.txt', 'w') as output:
-            output.write(hexa)
+        print("aucun param")
+    hexa=hex(binaire)
+    hexa+='\n'
+    print(hexa)
                     
-            #print(tableLabel[i][0])
+    with open('bin.txt', 'a') as output:
+        output.write(hexa)
+    #print(tableLabel[i][0])
         
 def main():
-    #tableLabel = label()
-    #remplaceLabel(tableLabel)
-
-    tableLabel = []    
-    instru, params = split_ligne(tableLabel,1)
-    cvted_inst = [convertInstruction(instru)]
-    cvted_param = convertParam(params,instru)
-    cvted_all = cvted_inst+cvted_param
-    print(cvted_all)   
-    listToBin(cvted_all,params)            
+    
+    with open('bin.txt', 'w') as output:
+        output.write('')
+    tableLabel = [] 
+    listeInstruction = []
+    split_ligne(tableLabel,listeInstruction)
+    run(listeInstruction,tableLabel)
 
 if __name__ == '__main__':
     main()
