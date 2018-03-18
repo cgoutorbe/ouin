@@ -27,9 +27,20 @@ fonction[18] = "SCALL"
 fonction[0] = "STOP"
 
 def binToInstr(instr):
+    """ Fonction binToInstr
+    Inputs : une instruction
+    ------
+    Outputs : un entier correspondant au code d'instruction 
+    """
     return (int((instr & 0xF8000000)>>27))
 
 def decode(instr,i):
+    """ Fonction decode
+    Inputs : une instruction 
+    ------   un entier correspondant au code de l'instruction traitée
+    Output : une liste comprenant le décodage de l'information selon la norme définie en cours
+    ------
+    """ 
     
     if 1<i<14:
         codeop = (instr & 0xF8000000) >> 27
@@ -69,6 +80,7 @@ def run(instruction):
 
 
 def main():
+    """ Fonction main : Boucle d'execution principale """  
     
     global pc
     pc=0

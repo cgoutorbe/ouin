@@ -1,6 +1,12 @@
 #-*- coding: utf-8 -*-
 
 def convertInstruction(instru):
+    """ Fonction convertInstuction
+    Inputs : une instruction
+    ------
+    Outputs : un entier représentatif de l'instruction pour notre encodage
+    -------
+    """ 
     instru = instru.upper()
     if instru=='ADD':
             return(1)
@@ -44,6 +50,11 @@ def convertInstruction(instru):
             return('Error while reading the instruction')
 
 def getNbParameters(instru):
+     """ Fonction getNbParameters
+    Inputs : l'entier caractéristique d'une instruction
+    ------
+    Outputs : un entier égal au nombre de paramètres de l'instruction d'entrée
+    ------- """
     if instru ==0:
             #print('Instruction stop')
             return(0)
@@ -58,6 +69,12 @@ def getNbParameters(instru):
             return(1)
 
 def splitParam(registers, nb_param):
+     """ Fonction splitParam
+    Inputs : les registres présents en paramètres d'une instruction
+    ------   le nombre de paramètres d'une instruction
+    Outputs : les registres à traiter, organisés sous forme de liste
+    -------
+    """
     if nb_param == 1:
             n = registers.rstrip('\n')
             return(n)
@@ -77,6 +94,12 @@ def splitParam(registers, nb_param):
             return([])
 
 def convertParam(tableLabel,params,instru):
+       """ Fonction convertParam
+    Inputs : les paramètres d'une instruction
+    ------   l'instruction associée aux paramètres
+    Outputs : une liste des paramètres de l'instruction, avec la prise en compte de l'immédiat
+    -------
+    """
     n = len(params)
     if n==3:
             R_alpha=params[0][1:]
@@ -154,6 +177,13 @@ def run(listeInstruction,tableLabel):
         listToBin(cvted_all,nb_param,instru)            
 
 def listToBin(l,params,instru):
+    """ Fonction listToBin : Cette fonction écrit en binaire dans un fichier bin.txt les instructions issues de asm.txt une fois encodée 
+    Inputs : une liste contenant les informations encodées d'une instruction
+    ------   un entier donnant le nombre de paramètres de l'instruction
+    Outputs : Aucune
+    ------- 
+    """
+    
     l = [int(i) for i in l]
     binaire = 0
     binaire+=l[0]<<27
@@ -186,6 +216,7 @@ def listToBin(l,params,instru):
     #print(tableLabel[i][0])
         
 def main():
+        """ Fonction main : boucle d'exécution principale """
     
     with open('bin.txt', 'w') as output:
         output.write('')
